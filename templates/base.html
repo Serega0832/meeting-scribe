@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Scribe</title>
+
+    <!-- 1. HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- 2. Подключаем Tailwind СРАЗУ с плагином typography -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <!-- 3. Подключаем библиотеку Marked (для превращения Markdown в HTML) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Наш скрипт -->
+    <script src="/static/js/script.js" defer></script>
+
+    <style>
+        .htmx-indicator{ display:none; }
+        .htmx-request .htmx-indicator{ display:flex; }
+        .htmx-request.htmx-indicator{ display:flex; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans p-6 min-h-screen">
+    {% block content %}{% endblock %}
+</body>
+</html>

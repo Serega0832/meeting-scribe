@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <header class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Meeting Scribe</h1>
+            <p class="text-slate-500">Автоматическая фиксация договоренностей</p>
+        </div>
+        <div class="text-sm text-slate-400">Gemini Powered</div>
+    </header>
+
+    <!-- Зона ошибок -->
+    <div id="error-container"></div>
+
+    <!-- ФОРМА -->
+    <form id="upload-form"
+          hx-encoding="multipart/form-data"
+          hx-post="/upload"
+          hx-target="#meetings-list"
+          hx-swap="afterbegin"
+          hx-indicator="#spinner"
+          hx-on::after-request="resetForm()">
+
+        <!-- 1. ЗОНА ЗАГРУЗКИ (Только для перетаскивания) -->
+        <div id="drop-zone" class="bg-white p-10 rounded-xl shadow-sm border-2 border-dashed border-slate-300 transition-all relative group cursor-pointer hover:border-blue-400 hover:bg-slate-50">
+
+            <input type="file" id="file-input" name="file" class="hidden" accept="audio/*,video/*">
+
+            <div class="flex flex-col items-center justify-center space-y-4 pointer-events-none">
+                <!-- Иконка меняется через JS -->
+                <div id="icon-container">
+                    <svg class="w-16 h-16 text-slate-300 group-hover:text-blue-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                </div>
+
+                <div class="text-center">
+                    <p id="drop-text" class="text-slate-600 font-medium text-lg">Нажмите или перетащите файл сюда</p>
+                    <p id="file-name" class="text-blue-600 font-bold text-xl mt-2 hidden"></p> <!-- Сюда вставится имя файла -->
+                    <p class="text-xs text-slate-400 mt-2">MP3, WAV, M4A, MP4, MOV, MKV</p>
+                </div>
+            </div>
+
+            <!-- Индикатор загрузки (спиннер) -->
+            <div id="spinner" class="htmx-indicator absolute inset-0 bg-white/95 flex flex-col items-center justify-center rounded-xl z-20 backdrop-blur-sm">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-blue-600 mb-4"></div>
+                <p class="text-blue-600 font-bold text-lg animate-pulse">Анализирую запись...</p>
+                <p class="text-slate-500 text-sm mt-2">Это может занять от 30 секунд до пары минут</p>
+            </div>
+        </div>
+
+        <!-- 2. КНОПКА ДЕЙСТВИЯ (Появляется ПОД зоной) -->
+        <!-- По умолчанию скрыта (hidden) -->
+        <div id="action-section" class="mt-6 text-center hidden transition-opacity duration-300">
+            <button type="submit" id="submit-btn" class="bg-blue-600 text-white text-lg px-10 py-3 rounded-lg hover:bg-blue-700 font-bold shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0">
+                🚀 Сделать транскрибацию
+            </button>
+            <p class="text-sm text-slate-400 mt-2">Нажмите, чтобы отправить файл в Gemini</p>
+        </div>
+
+    </form>
+
+    <!-- Список встреч -->
+    <div class="mt-10 space-y-4" id="meetings-list">
+        {% for meeting in meetings %}
+            {% include 'components/meeting_row.html' %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // Простой скрипт для открытия файла по клику на зону
+    document.getElementById('drop-zone').addEventListener('click', function() {
+        document.getElementById('file-input').click();
+    });
+
+    // Функция сброса формы после отправки
+    function resetForm() {
+        document.getElementById('upload-form').reset();
+        document.getElementById('action-section').classList.add('hidden');
+        document.getElementById('file-name').classList.add('hidden');
+        document.getElementById('drop-text').classList.remove('hidden');
+        document.getElementById('file-name').textContent = "";
+    }
+</script>
+{% endblock %}
